@@ -26,10 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -203,20 +200,14 @@ public class MainActivity extends AppCompatActivity {
                         int ts = lista.size();
                         int tl = contacts.size();
     
-                        if (ts == 0 || tl == 0) {
-                            s.clear();
-                            l.clear();
+                        if (ts == 0) {                            
+                            contacts.clear();
                         }
-                        else if (ts == tl) {  
-                            for (int i = 0; i < s.size(); i++) {
-                                if(s.get(i).getId() != l.get(i).getId()) {
-                                    l.set(i, s.get(i));
-                                }
-                                else {
-                                    l.get(i).setName(s.get(i).getName());
-                                }
-                            } 
-                        }
+                        else if (tl == 0) {
+                            for (int i = 0; i < s.size(); i++){
+                                l.add(s.get(i));
+                            }
+                        }                       
                         else {
                             int maior_valor = -1;
                             int menor_valor = -1;
@@ -224,21 +215,20 @@ public class MainActivity extends AppCompatActivity {
                             List<Contact> menor;
                             
                             if (ts > tl) {
-                                maior = s;
-                                menor = l;
+                                maior = lista;
+                                menor = contacts;
                                 maior_valor = ts;
                                 menor_valor = tl;
                             }
                             else {
-                                maior = l;
-                                menor = s;
+                                maior = contacts;
+                                menor = lista;
                                 maior_valor = tl;
                                 menor_valor = ts;
                             }
                             
                             if (menor_valor != 0) {
-                                for (int i = 0; i < maior_valor; i++) {
-                                    System.out.println(i);
+                                for (int i = 0; i <= maior_valor; i++) {                                    
                                     try { 
                                         if(maior.get(i).getId() != menor.get(i).getId()) {              
                                             boolean sucess = false;
@@ -249,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                                                 }
                                             }
                                             if (!sucess){                
-                                                maior.add(menor.get(i));
+                                                contacts.add(lista.get(i));
                                             }
                                         }
                                         else {
@@ -257,13 +247,19 @@ public class MainActivity extends AppCompatActivity {
                                             l.get(i).setName(s.get(i).getName());
                                         }
                                     } 
-                                    catch (Exception e){
-                                        //Log.d(LOG, "getContatos(): onResponse: caso onde veio mais dados que os locais" + e);
-                                        menor.add(maior.get(i));
+                                    catch (Exception e){                                        
+                                        try{
+                                            menor.add(maior.get(i));           
+                                        }
+                                        catch(Exception p){
+                                            menor.add(maior.get(i - 1));
+                                        }
                                     }         
                                 }      
                             }    
-                        }                                                
+                        } 
+                        
+                        Collections.sort(contacts);
 
                         Log.d(LOG, "getContatos(): onResponse: 2 - tamanho da lista de contatos puxados do servidor: " + lista.size());
                         Log.d(LOG, "getContatos(): onResponse: 2 - tamanho da lista de contatos locais: " + contacts.size());
