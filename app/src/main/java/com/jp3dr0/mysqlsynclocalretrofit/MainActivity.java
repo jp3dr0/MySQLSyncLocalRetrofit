@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     ContactAdapter adapter;
-    ArrayList<Contact> contacts = new ArrayList<>();
+    List<Contact> contacts = new ArrayList<Contact>();
     BroadcastReceiver broadcastReceiver;
     public static DbHelper dbHelper; // SQLite
 
@@ -181,14 +181,14 @@ public class MainActivity extends AppCompatActivity {
                     if (code == 200) {
                         List<Contact> lista = response.body();
                         Toast.makeText(getBaseContext(), "Total de contatos: " + lista.size(), Toast.LENGTH_LONG).show();
-                        //2
+                        
                         contacts.clear();
-                        //0
+                        
                         DbHelper dbHelper = new DbHelper(getApplicationContext());
                         SQLiteDatabase database = dbHelper.getReadableDatabase();
-                        //0
+                        
                         Cursor cursor = dbHelper.readFromLocalDatabase(database);
-                        //0
+                        
                         while (cursor.moveToNext()) {
                             int id = cursor.getInt(cursor.getColumnIndex(DbContract.ID));
                             String name = cursor.getString(cursor.getColumnIndex(DbContract.NAME));
@@ -196,46 +196,74 @@ public class MainActivity extends AppCompatActivity {
                             contacts.add(new Contact(id, name, sync_status));
                             Log.d(LOG, "x - tamanho da lista de contatos locais: " + contacts.size());
                         }
-                        //1
+                        
                         Log.d(LOG, "getContatos(): onResponse: 1 - tamanho da lista de contatos puxados do servidor: " + lista.size());
-                        Log.d(LOG, "getContatos(): onResponse: 1 - tamanho da lista de contatos locais: " + contacts.size());
+                        Log.d(LOG, "getContatos(): onResponse: 1 - tamanho da lista de contatos locais: " + contacts.size()):
 
-                        boolean anjo = contacts.size() > 0;
-
-                        Log.d(LOG, String.valueOf(anjo));
-
-                        if (contacts.size() > 0) {
-                            Log.d(LOG, "mim de papai");
-                            for (int i = 0; i <= contacts.size() - 1; i++) {
-                                Log.d(LOG, "opa blz tiago");
-                                Log.d(LOG, "x: " + i);
-                                if (lista.get(i).getId() != contacts.get(i).getId()) {
-                                    Log.d(LOG, "u: " + i);
-                                    Contact contact = lista.get(i);
-                                    contact.setSync_status(DbContract.SYNC_STATUS_OK);
-                                    boolean sucess1 = saveToLocalStorage(contact.getId(), contact.getName(), contact.getSync_status());
-                                    //boolean sucess2 = contacts.add(contact);
-                                    Log.d(LOG, "dinheiro no bolso");
-                                    Log.d(LOG, String.valueOf(sucess1));
+                        int ts = lista.size();
+                        int tl = contacts.size();
+    
+                        if (ts == 0 || tl == 0) {
+                            s.clear();
+                            l.clear();
+                        }
+                        else if (ts == tl) {  
+                            for (int i = 0; i < s.size(); i++) {
+                                if(s.get(i).getId() != l.get(i).getId()) {
+                                    l.set(i, s.get(i));
                                 }
                                 else {
-                                    Log.d(LOG, "tamanho do pe de mesa");
-                                    dbHelper.deleteContactFromLocalDatabase(database, contacts.get(i).getId());
-                                    //contacts.remove(contacts.get(i));
+                                    l.get(i).setName(s.get(i).getName());
                                 }
-                            }
+                            } 
                         }
-                        else if (contacts.size() <= 0) {
-                            for (int i = contacts.size(); i < lista.size(); i++) {
-                                Log.d(LOG, "i: " + i);
-                                Contact contact = lista.get(i);
-                                contact.setSync_status(DbContract.SYNC_STATUS_OK);
-                                boolean sucess1 = saveToLocalStorage(contact.getId(), contact.getName(), contact.getSync_status());
-                                //boolean sucess2 = contacts.add(contact);
-                                Log.d(LOG, "as gatas do lado");
-                                Log.d(LOG, String.valueOf(sucess1));
+                        else {
+                            int maior_valor = -1;
+                            int menor_valor = -1;
+                            List<Contact> maior;
+                            List<Contact> menor;
+                            
+                            if (ts > tl) {
+                                maior = s;
+                                menor = l;
+                                maior_valor = ts;
+                                menor_valor = tl;
                             }
-                        }
+                            else {
+                                maior = l;
+                                menor = s;
+                                maior_valor = tl;
+                                menor_valor = ts;
+                            }
+                            
+                            if (menor_valor != 0) {
+                                for (int i = 0; i < maior_valor; i++) {
+                                    System.out.println(i);
+                                    try { 
+                                        if(maior.get(i).getId() != menor.get(i).getId()) {              
+                                            boolean sucess = false;
+                                            for (int y = 0; y < maior_valor; y++) {
+                                                if (maior.get(y).getId() == menor.get(i).getId()){                  
+                                                    sucess = true;
+                                                    maior.set(y, menor.get(i)); 
+                                                }
+                                            }
+                                            if (!sucess){                
+                                                maior.add(menor.get(i));
+                                            }
+                                        }
+                                        else {
+                                            System.out.println("chocolate");
+                                            l.get(i).setName(s.get(i).getName());
+                                        }
+                                    } 
+                                    catch (Exception e){
+                                        //Log.d(LOG, "getContatos(): onResponse: caso onde veio mais dados que os locais" + e);
+                                        menor.add(maior.get(i));
+                                    }         
+                                }      
+                            }    
+                        }                                                
 
                         Log.d(LOG, "getContatos(): onResponse: 2 - tamanho da lista de contatos puxados do servidor: " + lista.size());
                         Log.d(LOG, "getContatos(): onResponse: 2 - tamanho da lista de contatos locais: " + contacts.size());
