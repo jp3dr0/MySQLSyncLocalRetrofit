@@ -1,9 +1,11 @@
 package com.jp3dr0.mysqlsynclocalretrofit;
 
+import java.util.*;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Contact implements Parcelable {
+public class Contact implements Parcelable, Comparable<Contact> {
     private int id;
     private String name;
     private int sync_status;
@@ -36,6 +38,17 @@ public class Contact implements Parcelable {
 
     public void setSync_status(int sync_status) {
         this.sync_status = sync_status;
+    }
+    
+    @Override
+    public int compareTo(Contact outro) {
+    	if (this.id > outro.getId()) {
+        	return 1;
+     	}
+     	if (this.id < outro.getId()) {
+        	return -1;
+     	}
+     		return 0;
     }
 
     @Override
