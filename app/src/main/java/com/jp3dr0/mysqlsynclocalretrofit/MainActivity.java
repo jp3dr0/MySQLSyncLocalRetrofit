@@ -243,16 +243,20 @@ public class MainActivity extends AppCompatActivity {
                                             }
                                         }
                                         else {
-                                            System.out.println("chocolate");
                                             l.get(i).setName(s.get(i).getName());
                                         }
                                     } 
-                                    catch (Exception e){                                        
-                                        try{
-                                            menor.add(maior.get(i));           
-                                        }
-                                        catch(Exception p){
-                                            menor.add(maior.get(i - 1));
+                                    catch (Exception e){
+                                        int contador = 1;
+                                        boolean sucess = false;
+                                        while(!sucess){
+                                            try{
+                                                menor.add(maior.get(i - contador));
+                                                sucess = true;
+                                            }
+                                            catch(Excepetion p){
+                                                contador += 1;
+                                            }
                                         }
                                     }         
                                 }      
